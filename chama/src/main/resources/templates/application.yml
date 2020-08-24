@@ -1,0 +1,13 @@
+spring:
+    datasource:
+        password: team189
+        url: jdbc:mysql://localhost:3306/team189?useSSL=false
+        username: team189
+    jpa:
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+swagger:
+    enable: true

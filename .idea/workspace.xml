@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="7be2395c-f9e8-4493-b6a2-c7bd8205f6ad" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/chama/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chama/.mvn/wrapper/MavenWrapperDownloader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chama/.mvn/wrapper/maven-wrapper.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chama/.mvn/wrapper/maven-wrapper.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chama/mvnw" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chama/mvnw.cmd" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chama/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chama/src/main/java/com/team189/backend/chama/ChamaApplication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chama/src/main/java/com/team189/backend/chama/controller/CustomerController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chama/src/main/java/com/team189/backend/chama/entity/Customers.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chama/src/main/java/com/team189/backend/chama/repository/CustomerRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chama/src/main/java/com/team189/backend/chama/service/CustomerService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chama/src/main/java/com/team189/backend/chama/service/CustomerServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chama/src/main/resources/application.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chama/src/test/java/com/team189/backend/chama/ChamaApplicationTests.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="$APPLICATION_HOME_DIR$/plugins/maven/lib/maven3" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="1gYeB7vVUlfaq5S9DNIoRa3SKV7" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../189" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7be2395c-f9e8-4493-b6a2-c7bd8205f6ad" name="Default Changelist" comment="" />
+      <created>1598295814277</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1598295814277</updated>
+      <workItem from="1598295815583" duration="2608000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="640" y="344" width="631" height="416" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1598296553173">
+      <screen x="0" y="27" width="1861" height="1053" />
+    </state>
+    <state x="640" y="344" width="631" height="416" key="#com.intellij.fileTypes.FileTypeChooser/0.27.1861.1053@0.27.1861.1053" timestamp="1598296553173" />
+    <state x="713" y="310" width="424" height="484" key="FileChooserDialogImpl" timestamp="1598296021743">
+      <screen x="0" y="27" width="1861" height="1053" />
+    </state>
+    <state x="713" y="310" width="424" height="484" key="FileChooserDialogImpl/0.27.1861.1053@0.27.1861.1053" timestamp="1598296021743" />
+  </component>
+</project>
