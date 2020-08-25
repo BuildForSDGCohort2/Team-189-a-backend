@@ -28,6 +28,7 @@ public class Customers implements Serializable {
     private String surname;
     @Column(name = "IDNO")
     private String idno;
+    @Column(name = "MSISDN")
     private String msisdn;
     @Column(name = "STATUS")
     private String status;
@@ -39,6 +40,7 @@ public class Customers implements Serializable {
     @Column(name = "PIN")
     private String pin;
     @Column(name = "DOB")
+    @Temporal(javax.persistence.TemporalType.DATE)
     private Date dob;
     @Column(name = "LOCATION")
     private String location;

@@ -9,7 +9,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team189.backend.chama.entity.Customers;
 import com.team189.backend.chama.model.CustomerPayload;
-import com.team189.backend.chama.service.CustomerService;
+import com.team189.backend.chama.model.PinChange;
+import com.team189.backend.chama.service.CrudService;
+import com.team189.backend.chama.service.Service;
+import com.team189.backend.chama.utils.Utils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
 /**
  *
  * @author moha
@@ -35,12 +39,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class CustomerController {
     private final Logger LOG = LoggerFactory.getLogger(CustomerController.class);
      @Autowired
-    CustomerService customerService;
+     CrudService crudService;
+     Service service = new Service();
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
      Map<String, Object> responseMap = new HashMap<>();
     @PostMapping("/user/registration")
 	public ResponseEntity<String> createCustomer(@RequestBody CustomerPayload payload) {
 		try {
+                    LOG.info("MOGAKA");
 		 Customers customers = new Customers();
                  Integer pin = ThreadLocalRandom.current().nextInt(1001, 9999);
                  customers.setFirstname(payload.getFirstname());
@@ -50,16 +56,58 @@ public class CustomerController {
                  customers.setStatus("active");
                  customers.setDateCreated(new Date());
                  customers.setDob(sdf.parse(payload.getDob()));
-                 customers.setPin(String.valueOf(pin));
-                 customerService.createAccount(customers);
+                 customers.setPin(Utils.getSHA256(String.valueOf(pin)));
+                 customers.setLocation(payload.getLocation());
+                 customers.setMarital_status(payload.getMaritalStatus());
+                 customers.setMsisdn(payload.getMsisdn());
+                 crudService.save(customers);
                  responseMap.put("responseCode","00");
                  responseMap.put("responseMessage","Successfully registered,your pin is "+String.valueOf(pin));
 			return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
 		} catch (JsonProcessingException | ParseException e) {
                  responseMap.put("responseCode", "01");
-                 responseMap.put("responseMessage", e.getMessage());
+                 responseMap.put("responseMessSage", e.getMessage());
                 }
                 return null;
 	}
+     @PostMapping(value = "/customer/pinchange")
+    public ResponseEntity<String> pinChange(@RequestBody PinChange payload) throws JsonProcessingException {
+        try {
+            String customer_name = service.changeCustomerPin(payload.getMsisdn(), payload.getPin(), payload.getNewpin());   
+            responseMap.put("responseCode", "00");
+            responseMap.put("responseMessage", "Dear "+customer_name+ "Change Pin request processed successfully");
+            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
+        } catch (JsonProcessingException e) {
+            responseMap.put("responseCode", "01");
+            responseMap.put("responseMessage", e.getMessage());
+            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
+        }
+    }
+      @PostMapping(value = "/customers")
+    public ResponseEntity<String> fetchCustomers() throws JsonProcessingException {
+        try {
+            String customers = service.fetchCustomers();   
+            responseMap.put("responseCode", "00");
+            responseMap.put("responseMessage",customers );
+            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
+        } catch (JsonProcessingException e) {
+            responseMap.put("responseCode", "01");
+            responseMap.put("responseMessage", e.getMessage());
+            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
+        }
+    }
+      @PostMapping(value = "/customer/pinauthentication")
+    public ResponseEntity<String> AuthenticateCustomer(@RequestBody PinChange payload) throws JsonProcessingException {
+        try {
+            String customer_name = service.AuthenticateCustomer(payload.getMsisdn(),payload.getPin());   
+            responseMap.put("responseCode", "00");
+            responseMap.put("responseMessage", "Dear "+customer_name+ "Change Pin request processed successfully");
+            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
+        } catch (JsonProcessingException e) {
+            responseMap.put("responseCode", "01");
+            responseMap.put("responseMessage", e.getMessage());
+            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
+        }
+    }
     
 }
