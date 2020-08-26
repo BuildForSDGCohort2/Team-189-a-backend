@@ -11,6 +11,7 @@ import com.team189.backend.chama.entity.Customers;
 import com.team189.backend.chama.model.CustomerPayload;
 import com.team189.backend.chama.model.PinChange;
 import com.team189.backend.chama.service.CrudService;
+import com.team189.backend.chama.service.CustomerService;
 import com.team189.backend.chama.service.Service;
 import com.team189.backend.chama.utils.Utils;
 import java.text.ParseException;
@@ -40,7 +41,9 @@ public class CustomerController {
     private final Logger LOG = LoggerFactory.getLogger(CustomerController.class);
      @Autowired
      CrudService crudService;
-     Service service = new Service();
+     @Autowired
+      CustomerService service;
+//     Service service = new Service();
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
      Map<String, Object> responseMap = new HashMap<>();
     @PostMapping("/user/registration")
