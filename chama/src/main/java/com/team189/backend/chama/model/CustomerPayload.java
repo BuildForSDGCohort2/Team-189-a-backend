@@ -9,17 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-"dob",
-"firstname",
-"surname",
-"gender",
-"idno",
-"location",
-"marital_status",
-"status",
-"msisdn"
-})
+@JsonPropertyOrder({"dob","firstname","surname","gender","idno","location","marital_status","status","msisdn"})
 public class CustomerPayload {
 
 @JsonProperty("dob")

@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.HibernateException;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,10 @@ public class CustomerServiceImpl implements CustomerService {
      CrudService crudeService;
      @Autowired
      Environment env;
+     public static final String  stk_push_shortcode = "";//763786";
+     public static final String  passkey = "";//9de221408c9ca4fe203a6bf30b1dc4ec5a0e98eb9965f576e7f6e759e3d17ff8";
+     public static final String stk_end_point ="";//https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
+     public static final String callbackurl = "";//https://b1d775948d63d5ee3734c3a62a261ef1.m.pipedream.net";
      private static final Logger LOGGER = LoggerFactory.getLogger(CustomerServiceImpl.class.getSimpleName());
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyyMMddHHmmss");
     @Override
@@ -105,20 +110,20 @@ public class CustomerServiceImpl implements CustomerService {
         try {
             String _timestamp = SDF.format(now);
             String requestBody = "{\n"
-                    + "      \"BusinessShortCode\": \"" + env.getRequiredProperty("stk_push_shortcode") + "\",\n"
-                    + "      \"Password\": \"" + getRequestPassword(env.getRequiredProperty("stk_push_shortcode"), env.getRequiredProperty("vision_fund_stk_push_passkey"), _timestamp) + "\",\n"
+                    + "      \"BusinessShortCode\": \"" + stk_push_shortcode + "\",\n"
+                    + "      \"Password\": \"" + getRequestPassword(stk_push_shortcode,passkey, _timestamp) + "\",\n"
                     + "      \"Timestamp\": \"" + _timestamp + "\",\n"
                     + "      \"TransactionType\": \"CustomerSavings\",\n"
                     + "      \"Amount\": \"" + amount + "\",\n"
                     + "      \"PartyA\": \"" + msisdn + "\",\n"
-                    + "      \"PartyB\": \"" + env.getRequiredProperty("stk_push_shortcode") + "\",\n"
+                    + "      \"PartyB\": \"" + stk_push_shortcode + "\",\n"
                     + "      \"PhoneNumber\": \"" + msisdn + "\",\n"
-                    + "      \"CallBackURL\": \"" + env.getRequiredProperty("callback_url") + "\",\n"
+                    + "      \"CallBackURL\": \"" + callbackurl + "\",\n"
                     + "      \"AccountReference\": \"" + ref + "\",\n"
                     + "      \"TransactionDesc\": \"STK Push\"\n"
                     + "    }";
             LOGGER.info("REQBODY={}", msisdn, requestBody);
-            String response = Postpayload(env.getRequiredProperty("vision_fund_stk_safaricom_api_endpoint"), requestBody, "Bearer " + BeareTokenService.token);
+            String response = postPayload(env.getRequiredProperty(stk_end_point), requestBody, "Bearer " + BeareTokenService.token);
             LOGGER.info("response={}", msisdn, response);
              JSONObject jsonObjectResponse = new JSONObject(response);
             String MerchantRequestID = jsonObjectResponse.get("MerchantRequestID").toString();
@@ -129,7 +134,7 @@ public class CustomerServiceImpl implements CustomerService {
                 Transaction trx = new Transaction();
                 trx.setTrx_type("STK_PUSH");
                 trx.setSender_party(msisdn);
-                trx.setReceiver_party(env.getRequiredProperty("stk_push_shortcode"));
+                trx.setReceiver_party(stk_push_shortcode);
                 trx.setCompleted_date(now);
                 trx.setBillrefnumber(ref);
                 trx.setProcessing_status("Completed");
@@ -139,11 +144,11 @@ public class CustomerServiceImpl implements CustomerService {
                 trx.setCheckout_id(CheckoutRequestID);
                 crudeService.save(trx);
             }
-        } catch (Exception e) {
+        } catch (IOException | IllegalStateException | HibernateException | JSONException e) {
             throw new NonRollbackException(e.getMessage());
         }
     }
-       private String Postpayload(String endPointURL, String requestBody, String authKey) throws MalformedURLException, IOException {
+       private String postPayload(String endPointURL, String requestBody, String authKey) throws MalformedURLException, IOException {
         URL url = new URL(endPointURL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");

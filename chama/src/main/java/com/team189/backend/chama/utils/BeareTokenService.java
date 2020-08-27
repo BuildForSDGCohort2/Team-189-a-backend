@@ -6,7 +6,6 @@ import java.util.Base64;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.annotation.PostConstruct;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import org.slf4j.Logger;
@@ -21,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -32,7 +30,7 @@ import org.springframework.web.client.RestTemplate;
 @Transactional
 public class BeareTokenService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BeareTokenService.class.getSimpleName());
+    private static final Logger LOG = LoggerFactory.getLogger(BeareTokenService.class);
     public static String token = "";
     private static final Set<String> _safaricomPrefixes = new LinkedHashSet<>();
 
@@ -62,7 +60,7 @@ public class BeareTokenService {
     @Scheduled(initialDelay = 3000, fixedDelay = 1000 * 60 * 30)
     public void autoSetOauthBearerCode() {
         try {
-            String accessToken = generateAccessToken(env);
+            String accessToken = generateAccessToken();
             token = accessToken;
             LOG.info("Refreshed token={}", token);
         } catch (Exception e) {
@@ -70,14 +68,14 @@ public class BeareTokenService {
         }
     }
 
-    private String generateAccessToken(Environment env) {
+    private String generateAccessToken() {
 
         String accessToken = "";
         try {
             RestTemplate restTemplate = new RestTemplate();
-            String authUrl = env.getProperty("stk_bearer_auth_url");
-            String customerKey = env.getProperty("mpesa_consumer_key");
-            String customerSecret = env.getProperty("consumer_secret");
+            String authUrl = "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
+            String customerKey = "DnllNPz5hK2aEXCKiHgTVi5X5xSGw7z0";
+            String customerSecret = "v90MM7AEYbDbPgSU";
 
             String encryptByte = customerKey + ":" + customerSecret;
             // encode with padding
@@ -103,7 +101,7 @@ public class BeareTokenService {
                 String expires_in = authResponse.getString("expires_in");
                 LOG.info("expires_in : " + expires_in);
             }
-        } catch (RestClientException | JSONException e) {
+        } catch (Exception e) {
             LOG.info("Encountered error in bearer authentication : " + e.getMessage());
         }
         return accessToken;
