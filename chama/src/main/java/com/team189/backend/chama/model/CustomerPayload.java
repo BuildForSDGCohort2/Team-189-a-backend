@@ -30,6 +30,8 @@ private String maritalStatus;
 private String status;
 @JsonProperty("msisdn")
 private String msisdn;
+@JsonProperty("chama_id")
+private String chama_id;
 @JsonIgnore
 private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -121,6 +123,15 @@ return msisdn;
 public void setMsisdn(String msisdn) {
 this.msisdn = msisdn;
 }
+
+    public String getChama_id() {
+        return chama_id;
+    }
+
+    public void setChama_id(String chama_id) {
+        this.chama_id = chama_id;
+    }
+
 
 @JsonAnyGetter
 public Map<String, Object> getAdditionalProperties() {

@@ -46,7 +46,7 @@ public class Transaction implements Serializable {
     private String receiver_party;
     @Column(name = "SENDER_PARTY")
     private String sender_party;
-    @Column(name = "BILL_REFERNCE_NUMBER")
+    @Column(name = "BILL_REFERENCE_NUMBER")
     private String billrefnumber;
     
      public Transaction(){

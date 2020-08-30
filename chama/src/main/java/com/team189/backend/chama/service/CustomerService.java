@@ -21,7 +21,8 @@ public interface CustomerService {
 
     public String AuthenticateCustomer(String msisdn, String pin);
     
-    public void processSavingsDeposit(String msisdn, String amount, String ref) throws NonRollbackException;
+    public String processSavingsDeposit(String msisdn, String amount, String ref) throws NonRollbackException;
+
 
     
 }

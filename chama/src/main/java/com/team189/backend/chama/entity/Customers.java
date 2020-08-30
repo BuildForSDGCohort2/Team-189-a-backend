@@ -46,6 +46,8 @@ public class Customers implements Serializable {
     private String location;
     @Column(name = "GENDER")
     private String gender;
+    @Column(name = "CHAMA_ID")
+    private String chama_id;
      public Customers(){
     
      }
@@ -145,6 +147,15 @@ public class Customers implements Serializable {
     public void setGender(String gender) {
         this.gender = gender;
     }
+
+    public String getChama_id() {
+        return chama_id;
+    }
+
+    public void setChama_id(String chama_id) {
+        this.chama_id = chama_id;
+    }
+    
      
 }
 

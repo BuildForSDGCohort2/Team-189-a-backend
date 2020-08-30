@@ -7,7 +7,9 @@ package com.team189.backend.chama.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team189.backend.chama.entity.Chama;
 import com.team189.backend.chama.entity.Customers;
+import com.team189.backend.chama.exception.NonRollbackException;
 import com.team189.backend.chama.model.CustomerPayload;
 import com.team189.backend.chama.model.PinChange;
 import com.team189.backend.chama.service.CrudService;
@@ -28,6 +30,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.team189.backend.chama.model.ChamaModel;
+import com.team189.backend.chama.model.SaveModel;
+import java.util.logging.Level;
 
 
 /**
@@ -41,8 +46,7 @@ public class CustomerController {
      @Autowired
      CrudService crudService;
      @Autowired
-      CustomerService service;
-//     Service service = new Service();
+     CustomerService service;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
      Map<String, Object> responseMap = new HashMap<>();
     @PostMapping("/user/registration")
@@ -62,6 +66,7 @@ public class CustomerController {
                  customers.setLocation(payload.getLocation());
                  customers.setMarital_status(payload.getMaritalStatus());
                  customers.setMsisdn(payload.getMsisdn());
+                 customers.setChama_id(payload.getChama_id());
                  crudService.save(customers);
                  responseMap.put("responseCode","00");
                  responseMap.put("responseMessage","Successfully registered,your pin is "+String.valueOf(pin));
@@ -111,5 +116,46 @@ public class CustomerController {
             return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
         }
     }
-    
+    @PostMapping(value="/chama/registration")
+    public ResponseEntity<String>registerChame(@RequestBody ChamaModel payload){
+        try{
+          Chama chama = new Chama();
+          chama.setChama_name(payload.getName());
+          chama.setChama_id(payload.getChamaId());
+          crudService.save(chama);
+            responseMap.put("responseCode", "00");
+            responseMap.put("responseMessage", "Chama Created Successfully");
+            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap),HttpStatus.OK);
+            
+    }catch(JsonProcessingException e){
+            try {
+                responseMap.put("responseCode", "01");
+                responseMap.put("responseMessage", e.getMessage()); 
+                return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
+            } catch (JsonProcessingException ex) {
+                java.util.logging.Logger.getLogger(CustomerController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+    }
+   return null; 
+}     
+/**
+ * 
+ * @param payload
+ * @return 
+ */
+      @PostMapping(value="/savings")
+    public ResponseEntity<String>SaveMoney(@RequestBody SaveModel payload) throws NonRollbackException, JsonProcessingException{
+         try {
+            String customers = service.processSavingsDeposit(payload.getAmount(),payload.getMsisdn(),"N"+payload.getMsisdn());   
+            responseMap.put("responseCode", "00");
+            responseMap.put("responseMessage","Request Received for Processing" );
+            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
+        } catch (JsonProcessingException e) {
+            responseMap.put("responseCode", "01");
+            responseMap.put("responseMessage", e.getMessage());
+            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
+        }
+            
 }
+}
+

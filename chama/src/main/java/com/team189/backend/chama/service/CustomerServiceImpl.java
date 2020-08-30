@@ -105,7 +105,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void processSavingsDeposit(String msisdn, String amount, String ref) throws NonRollbackException {
+    public String processSavingsDeposit(String msisdn, String amount, String ref) throws NonRollbackException {
         Date now = new Date(System.currentTimeMillis());
         try {
             String _timestamp = SDF.format(now);
@@ -143,10 +143,12 @@ public class CustomerServiceImpl implements CustomerService {
                 trx.setRequest_id(MerchantRequestID);
                 trx.setCheckout_id(CheckoutRequestID);
                 crudeService.save(trx);
+                return trx.toString();
             }
         } catch (IOException | IllegalStateException | HibernateException | JSONException e) {
             throw new NonRollbackException(e.getMessage());
         }
+        return null;
     }
        private String postPayload(String endPointURL, String requestBody, String authKey) throws MalformedURLException, IOException {
         URL url = new URL(endPointURL);
