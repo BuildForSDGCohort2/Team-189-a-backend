@@ -32,7 +32,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.team189.backend.chama.model.ChamaModel;
 import com.team189.backend.chama.model.SaveModel;
+import com.team189.backend.chama.repository.CustomerRepository;
+import java.util.List;
 import java.util.logging.Level;
+import org.springframework.web.bind.annotation.GetMapping;
 
 
 /**
@@ -47,6 +50,8 @@ public class CustomerController {
      CrudService crudService;
      @Autowired
      CustomerService service;
+     @Autowired
+     CustomerRepository cust;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
      Map<String, Object> responseMap = new HashMap<>();
     @PostMapping("/user/registration")
@@ -80,41 +85,39 @@ public class CustomerController {
      @PostMapping(value = "/customer/pinchange")
     public ResponseEntity<String> pinChange(@RequestBody PinChange payload) throws JsonProcessingException {
         try {
-            String customer_name = service.changeCustomerPin(payload.getMsisdn(), payload.getPin(), payload.getNewpin());   
+            LOG.info("Awesome "+payload);
+            String customer_name = service.changeCustomerPin(payload.getMsisdn(), payload.getPin(), payload.getNewpin()); 
+            if(customer_name.equals("00")){
             responseMap.put("responseCode", "00");
-            responseMap.put("responseMessage", "Dear "+customer_name+ "Change Pin request processed successfully");
+            responseMap.put("responseMessage", "Change Pin request processed successfully");
             return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
+            }
         } catch (JsonProcessingException e) {
-            responseMap.put("responseCode", "01");
-            responseMap.put("responseMessage", e.getMessage());
-            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
+           e.getLocalizedMessage();
         }
+            responseMap.put("responseCode", "01");
+            responseMap.put("responseMessage", "pin mismatch");
+            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
     }
-      @PostMapping(value = "/customers")
-    public ResponseEntity<String> fetchCustomers() throws JsonProcessingException {
-        try {
-            String customers = service.fetchCustomers();   
-            responseMap.put("responseCode", "00");
-            responseMap.put("responseMessage",customers );
-            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
-        } catch (JsonProcessingException e) {
-            responseMap.put("responseCode", "01");
-            responseMap.put("responseMessage", e.getMessage());
-            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
-        }
+     @GetMapping("/customers")
+    public List<Customers> getAllCustomers() {
+        return cust.findAll();
     }
       @PostMapping(value = "/customer/pinauthentication")
     public ResponseEntity<String> AuthenticateCustomer(@RequestBody PinChange payload) throws JsonProcessingException {
         try {
-            String customer_name = service.AuthenticateCustomer(payload.getMsisdn(),payload.getPin());   
+            String customer_name = service.AuthenticateCustomer(payload.getMsisdn(),payload.getPin()); 
+            if(customer_name!=null){
             responseMap.put("responseCode", "00");
-            responseMap.put("responseMessage", "Dear "+customer_name+ "Change Pin request processed successfully");
+            responseMap.put("responseMessage", customer_name+" Authenticated successfully");
             return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
+            }
         } catch (JsonProcessingException e) {
-            responseMap.put("responseCode", "01");
-            responseMap.put("responseMessage", e.getMessage());
-            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
+            e.getMessage();
         }
+            responseMap.put("responseCode", "01");
+            responseMap.put("responseMessage","Authentication failed");
+            return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);
     }
     @PostMapping(value="/chama/registration")
     public ResponseEntity<String>registerChame(@RequestBody ChamaModel payload){
@@ -142,11 +145,13 @@ public class CustomerController {
  * 
  * @param payload
  * @return 
+     * @throws com.team189.backend.chama.exception.NonRollbackException 
+     * @throws com.fasterxml.jackson.core.JsonProcessingException 
  */
       @PostMapping(value="/savings")
     public ResponseEntity<String>SaveMoney(@RequestBody SaveModel payload) throws NonRollbackException, JsonProcessingException{
          try {
-            String customers = service.processSavingsDeposit(payload.getAmount(),payload.getMsisdn(),"N"+payload.getMsisdn());   
+            String customers = service.processSavingsDeposit(payload.getAmount(),payload.getMsisdn(),payload.getReference());   
             responseMap.put("responseCode", "00");
             responseMap.put("responseMessage","Request Received for Processing" );
             return new ResponseEntity<>(new ObjectMapper().writeValueAsString(responseMap), HttpStatus.OK);

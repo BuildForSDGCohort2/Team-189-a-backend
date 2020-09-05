@@ -17,7 +17,6 @@ public interface CustomerService {
 
     public String changeCustomerPin(String msisdn, String pin, String newpin);
 
-    public String fetchCustomers();
 
     public String AuthenticateCustomer(String msisdn, String pin);
     
