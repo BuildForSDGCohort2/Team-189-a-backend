@@ -2,9 +2,11 @@ package com.team189.backend.chama.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team189.backend.chama.controller.CustomerController;
 import com.team189.backend.chama.entity.Customers;
 import com.team189.backend.chama.entity.Transaction;
 import com.team189.backend.chama.exception.NonRollbackException;
+import com.team189.backend.chama.repository.CustomerRepository;
 import com.team189.backend.chama.utils.BeareTokenService;
 import com.team189.backend.chama.utils.Utils;
 import java.io.BufferedReader;
@@ -41,67 +43,45 @@ public class CustomerServiceImpl implements CustomerService {
      CrudService crudeService;
      @Autowired
      Environment env;
-     public static final String  stk_push_shortcode = "";//763786";
-     public static final String  passkey = "";//9de221408c9ca4fe203a6bf30b1dc4ec5a0e98eb9965f576e7f6e759e3d17ff8";
-     public static final String stk_end_point ="";//https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
-     public static final String callbackurl = "";//https://b1d775948d63d5ee3734c3a62a261ef1.m.pipedream.net";
+     private final Logger LOG = LoggerFactory.getLogger(CustomerServiceImpl.class);
+
+     public static final String  stk_push_shortcode = "763786";
+     public static final String  passkey = "9de221408c9ca4fe203a6bf30b1dc4ec5a0e98eb9965f576e7f6e759e3d17ff8";
+     public static final String stk_end_point ="https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
+     public static final String callbackurl = "https://197.232.25.76/frameworkCallbacks/callFrameworkVisionFundStkPush.php";
      private static final Logger LOGGER = LoggerFactory.getLogger(CustomerServiceImpl.class.getSimpleName());
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyyMMddHHmmss");
     @Override
     public String changeCustomerPin(String msisdn, String pin, String newpin) {
-         String q = "SELECT firstname FROM Customers where msisdn='"+msisdn+"'";
-         List<Object> response = crudeService.fetchWithNativeQuery(q, Collections.EMPTY_MAP, 0, 1);
-        if(response.isEmpty()){
-             try {
-                 throw new NonRollbackException("Customer record not found");
-             } catch (NonRollbackException ex) {
-             }
-        }
-          String fname= String.valueOf(response.get(0));
-          String sq = "SELECT pin FROM Customers where msisdn='"+msisdn+"'";
-          List<Object> rs = crudeService.fetchWithNativeQuery(q, Collections.EMPTY_MAP, 0, 1);
+         String msg="";
+          String sq = "SELECT pin FROM customers where msisdn='"+msisdn+"'";
+          List<Object> rs = crudeService.fetchWithNativeQuery(sq, Collections.EMPTY_MAP, 0, 1);
           if(rs.get(0).toString().equals(Utils.getSHA256(pin))){
-          String sql = "UPDATE Customers SET pin='"+Utils.getSHA256(newpin)+"' WHERE msidn='"+msisdn+"'";
+          String sql = "UPDATE customers SET pin='"+Utils.getSHA256(newpin)+"' WHERE msisdn='"+msisdn+"'";
+          LOG.info("Cool "+sql);
           crudeService.executeNativeQuery(sql, Collections.EMPTY_MAP);
-          }
-          return fname;
+          msg ="00";
+          }else{
+          msg ="01";   
+          } 
+          LOG.info("Cool "+msg);
+          return msg;
     }
-    @Override
-    public String fetchCustomers() {
-        try{
-        Map<String,String> map = new HashMap<>();
-        String q = "SELECT * FROM Customers where status='active'";
-        List<Customers> rs = crudeService.fetchWithHibernateQuery(q, Collections.EMPTY_MAP);
-        for(Customers tx:rs){
-            map.put("firstname", tx.getFirstname());
-            map.put("surname",tx.getSurname());
-            map.put("msisdn", tx.getMsisdn());
-            map.put("status", tx.getStatus());
-            map.put("idno",tx.getIdno());
-            map.put("location",tx.getLocation());
-        }
-        return new ObjectMapper().writeValueAsString(map);
-        }catch(JsonProcessingException | HibernateException e){
-            e.getLocalizedMessage();
-        }
-        return null;
-    }
-
+  
     @Override
     public String AuthenticateCustomer(String msisdn, String pin) {
         try{
-                String q = "SELECT pin FROM Customers where msisdn='"+msisdn+"'";
+                String q = "SELECT pin FROM customers where msisdn='"+msisdn+"'";
                 List<Object> response = crudeService.fetchWithNativeQuery(q, Collections.EMPTY_MAP, 0, 1);
                 if(String.valueOf(response.get(0)).equalsIgnoreCase(Utils.getSHA256(pin))){
-                 String sql = "SELECT firstname FROM Customers where msisdn='"+msisdn+"'";
-                 String msg = crudeService.fetchWithNativeQuery(q, Collections.EMPTY_MAP, 0, 1).get(0).toString();
+                 String sql = "SELECT firstname FROM customers where msisdn='"+msisdn+"'";
+                 String msg = crudeService.fetchWithNativeQuery(sql, Collections.EMPTY_MAP, 0, 1).get(0).toString();
                  return msg; 
-                }else{
-                    throw new NonRollbackException("Invalid Credentials");
                 }
                }catch(Exception e){
                   return e.getLocalizedMessage();
                }   
+        return null;
     }
 
     @Override
@@ -122,8 +102,8 @@ public class CustomerServiceImpl implements CustomerService {
                     + "      \"AccountReference\": \"" + ref + "\",\n"
                     + "      \"TransactionDesc\": \"STK Push\"\n"
                     + "    }";
-            LOGGER.info("REQBODY={}", msisdn, requestBody);
-            String response = postPayload(env.getRequiredProperty(stk_end_point), requestBody, "Bearer " + BeareTokenService.token);
+            LOGGER.info("REQBODY={}",requestBody);
+            String response = postPayload(stk_end_point, requestBody, "Bearer " + BeareTokenService.token);
             LOGGER.info("response={}", msisdn, response);
              JSONObject jsonObjectResponse = new JSONObject(response);
             String MerchantRequestID = jsonObjectResponse.get("MerchantRequestID").toString();
@@ -145,8 +125,8 @@ public class CustomerServiceImpl implements CustomerService {
                 crudeService.save(trx);
                 return trx.toString();
             }
-        } catch (IOException | IllegalStateException | HibernateException | JSONException e) {
-            throw new NonRollbackException(e.getMessage());
+        } catch (Exception e) {
+            e.getLocalizedMessage();
         }
         return null;
     }
